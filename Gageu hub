@@ -1,0 +1,490 @@
+-- =========================
+-- Gageu Hub FINAL v1.5
+-- Criado por Ped Drones
+-- =========================
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- =========================
+-- Funções auxiliares
+-- =========================
+local function CreateGUI()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "GageuHub"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    return ScreenGui
+end
+
+local function MakeDraggable(frame)
+    frame.Active = true
+    frame.Draggable = true
+end
+
+local function AnimateButton(button, on)
+    local targetColor = on and Color3.fromRGB(0,200,0) or Color3.fromRGB(200,0,0)
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = targetColor})
+    tween:Play()
+end
+
+-- =========================
+-- GUI
+-- =========================
+local ScreenGui = CreateGUI()
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0,520,0,420)
+MainFrame.Position = UDim2.new(0.5,-260,0.5,-210)
+MainFrame.BackgroundColor3 = Color3.fromRGB(40,40,50)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+MakeDraggable(MainFrame)
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Thickness = 2
+UIStroke.Color = Color3.fromRGB(80,80,120)
+UIStroke.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1,0,0,50)
+Title.BackgroundTransparency = 1
+Title.Text = "⚡ Gageu Hub"
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 28
+Title.Parent = MainFrame
+
+local Credits = Instance.new("TextLabel")
+Credits.Size = UDim2.new(1,0,0,20)
+Credits.Position = UDim2.new(0,0,0,50)
+Credits.BackgroundTransparency = 1
+Credits.Text = "by Ped Drones"
+Credits.TextColor3 = Color3.fromRGB(200,200,255)
+Credits.Font = Enum.Font.Gotham
+Credits.TextSize = 14
+Credits.Parent = MainFrame
+
+-- Fechar / Minimizar / Restaurar
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0,35,0,35)
+CloseButton.Position = UDim2.new(1,-40,0,5)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255,80,80)
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255,255,255)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 20
+CloseButton.Parent = MainFrame
+
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Size = UDim2.new(0,35,0,35)
+MinimizeButton.Position = UDim2.new(1,-80,0,5)
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(100,100,255)
+MinimizeButton.Text = "_"
+MinimizeButton.TextColor3 = Color3.fromRGB(255,255,255)
+MinimizeButton.Font = Enum.Font.GothamBold
+MinimizeButton.TextSize = 20
+MinimizeButton.Parent = MainFrame
+
+local RestoreButton = Instance.new("TextButton")
+RestoreButton.Size = UDim2.new(0,60,0,60)
+RestoreButton.Position = UDim2.new(0.5,-30,0.5,-30)
+RestoreButton.BackgroundColor3 = Color3.fromRGB(80,80,120)
+RestoreButton.Text = "Open"
+RestoreButton.TextColor3 = Color3.fromRGB(255,255,255)
+RestoreButton.Font = Enum.Font.GothamBold
+RestoreButton.TextSize = 18
+RestoreButton.Visible = false
+RestoreButton.Parent = ScreenGui
+MakeDraggable(RestoreButton)
+
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+MinimizeButton.MouseButton1Click:Connect(function()
+    local tween = TweenService:Create(MainFrame, TweenInfo.new(0.5), {BackgroundTransparency = 1})
+    tween:Play()
+    tween.Completed:Connect(function()
+        MainFrame.Visible = false
+        RestoreButton.Visible = true
+        MainFrame.BackgroundTransparency = 0
+    end)
+end)
+
+RestoreButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    local tween = TweenService:Create(MainFrame, TweenInfo.new(0.5), {BackgroundTransparency = 1})
+    tween:Play()
+    tween.Completed:Connect(function()
+        MainFrame.BackgroundTransparency = 0
+    end)
+    RestoreButton.Visible = false
+end)
+
+-- =========================
+-- Abas
+-- =========================
+local PagesFrame = Instance.new("Frame")
+PagesFrame.Size = UDim2.new(0,140,1,-70)
+PagesFrame.Position = UDim2.new(0,0,0,70)
+PagesFrame.BackgroundColor3 = Color3.fromRGB(50,50,70)
+PagesFrame.BorderSizePixel = 0
+PagesFrame.Parent = MainFrame
+
+local ContentFrame = Instance.new("Frame")
+ContentFrame.Size = UDim2.new(1,-140,1,-70)
+ContentFrame.Position = UDim2.new(0,140,0,70)
+ContentFrame.BackgroundColor3 = Color3.fromRGB(60,60,80)
+ContentFrame.BorderSizePixel = 0
+ContentFrame.Parent = MainFrame
+
+local function ClearContent()
+    for _,v in pairs(ContentFrame:GetChildren()) do
+        v:Destroy()
+    end
+end
+
+local MainPageButton = Instance.new("TextButton")
+MainPageButton.Size = UDim2.new(1,0,0,50)
+MainPageButton.Position = UDim2.new(0,0,0,0)
+MainPageButton.Text = "Main"
+MainPageButton.BackgroundColor3 = Color3.fromRGB(70,70,100)
+MainPageButton.TextColor3 = Color3.fromRGB(255,255,255)
+MainPageButton.Font = Enum.Font.GothamBold
+MainPageButton.TextSize = 18
+MainPageButton.Parent = PagesFrame
+
+local TroolPageButton = Instance.new("TextButton")
+TroolPageButton.Size = UDim2.new(1,0,0,50)
+TroolPageButton.Position = UDim2.new(0,0,0,60)
+TroolPageButton.Text = "Trool"
+TroolPageButton.BackgroundColor3 = Color3.fromRGB(70,70,100)
+TroolPageButton.TextColor3 = Color3.fromRGB(255,255,255)
+TroolPageButton.Font = Enum.Font.GothamBold
+TroolPageButton.TextSize = 18
+TroolPageButton.Parent = PagesFrame
+
+-- =========================
+-- Variáveis de jogo
+-- =========================
+local FlySpeed = 50
+local Flying = false
+local NoclipEnabled = false
+local ESPEnabled = false
+local SkinRGBEnabled = false
+local ESPObjects = {}
+local FlyKeys = {W=false, A=false, S=false, D=false, Space=false, Shift=false}
+
+-- =========================
+-- ESP
+-- =========================
+local function UpdateESP()
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            if not ESPObjects[player] then
+                local box = Instance.new("BoxHandleAdornment")
+                box.Size = Vector3.new(4,6,2)
+                box.Adornee = player.Character:FindFirstChild("HumanoidRootPart")
+                box.Color3 = Color3.fromRGB(0,255,0)
+                box.Transparency = 0.5
+                box.AlwaysOnTop = true
+                box.ZIndex = 10
+                box.Parent = player.Character:FindFirstChild("HumanoidRootPart")
+                ESPObjects[player] = box
+
+                local nameTag = Instance.new("BillboardGui")
+                nameTag.Adornee = player.Character:FindFirstChild("HumanoidRootPart")
+                nameTag.Size = UDim2.new(0,100,0,30)
+                nameTag.AlwaysOnTop = true
+                local label = Instance.new("TextLabel")
+                label.Size = UDim2.new(1,0,1,0)
+                label.Text = player.Name
+                label.TextColor3 = Color3.new(0,1,0)
+                label.BackgroundTransparency = 1
+                label.Font = Enum.Font.GothamBold
+                label.TextScaled = true
+                label.Parent = nameTag
+                nameTag.Parent = player.Character:FindFirstChild("HumanoidRootPart")
+            end
+        end
+    end
+end
+
+local function RemoveESP()
+    for _, obj in pairs(ESPObjects) do
+        if obj and obj.Parent then obj:Destroy() end
+    end
+    ESPObjects = {}
+end
+
+-- =========================
+-- Noclip
+-- =========================
+RunService.Stepped:Connect(function()
+    if LocalPlayer.Character then
+        for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = not NoclipEnabled and true or false
+            end
+        end
+    end
+end)
+
+-- =========================
+-- Fly estilo Fly GUI
+-- =========================
+local FlyVelocity, FlyBodyGyro
+local function StartFly()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = LocalPlayer.Character.HumanoidRootPart
+        FlyVelocity = Instance.new("BodyVelocity")
+        FlyVelocity.MaxForce = Vector3.new(1e5,1e5,1e5)
+        FlyVelocity.Velocity = Vector3.new(0,0,0)
+        FlyVelocity.Parent = hrp
+
+        FlyBodyGyro = Instance.new("BodyGyro")
+        FlyBodyGyro.MaxTorque = Vector3.new(1e5,1e5,1e5)
+        FlyBodyGyro.CFrame = hrp.CFrame
+        FlyBodyGyro.Parent = hrp
+
+        Flying = true
+    end
+end
+
+local function StopFly()
+    Flying = false
+    if FlyVelocity then FlyVelocity:Destroy() end
+    if FlyBodyGyro then FlyBodyGyro:Destroy() end
+end
+
+RunService.RenderStepped:Connect(function()
+    if Flying and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = LocalPlayer.Character.HumanoidRootPart
+        local moveDir = Vector3.new()
+        local cam = Camera.CFrame
+
+        if FlyKeys.W then moveDir = moveDir + cam.LookVector end
+        if FlyKeys.S then moveDir = moveDir - cam.LookVector end
+        if FlyKeys.A then moveDir = moveDir - cam.RightVector end
+        if FlyKeys.D then moveDir = moveDir + cam.RightVector end
+        if FlyKeys.Space then moveDir = moveDir + Vector3.new(0,1,0) end
+        if FlyKeys.Shift then moveDir = moveDir - Vector3.new(0,1,0) end
+
+        if moveDir.Magnitude > 0 then
+            FlyVelocity.Velocity = moveDir.Unit * FlySpeed
+        else
+            FlyVelocity.Velocity = Vector3.new(0,0,0)
+        end
+
+        FlyBodyGyro.CFrame = CFrame.new(hrp.Position, hrp.Position + cam.LookVector)
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.W then FlyKeys.W = true end
+    if input.KeyCode == Enum.KeyCode.A then FlyKeys.A = true end
+    if input.KeyCode == Enum.KeyCode.S then FlyKeys.S = true end
+    if input.KeyCode == Enum.KeyCode.D then FlyKeys.D = true end
+    if input.KeyCode == Enum.KeyCode.Space then FlyKeys.Space = true end
+    if input.KeyCode == Enum.KeyCode.LeftShift then FlyKeys.Shift = true end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.W then FlyKeys.W = false end
+    if input.KeyCode == Enum.KeyCode.A then FlyKeys.A = false end
+    if input.KeyCode == Enum.KeyCode.S then FlyKeys.S = false end
+    if input.KeyCode == Enum.KeyCode.D then FlyKeys.D = false end
+    if input.KeyCode == Enum.KeyCode.Space then FlyKeys.Space = false end
+    if input.KeyCode == Enum.KeyCode.LeftShift then FlyKeys.Shift = false end
+end)
+
+-- =========================
+-- Skin RGB
+-- =========================
+spawn(function()
+    while true do
+        wait(2)
+        if SkinRGBEnabled and LocalPlayer.Character then
+            for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.BrickColor = BrickColor.Random()
+                end
+            end
+        end
+    end
+end)
+
+-- =========================
+-- Conteúdo da Main e Trool
+-- =========================
+local function LoadMain()
+    ClearContent()
+    local y = 10
+    local function AddTextBoxOption(text, callback)
+        local label = Instance.new("TextLabel")
+        label.Text = text
+        label.Size = UDim2.new(0,150,0,30)
+        label.Position = UDim2.new(0,10,0,y)
+        label.BackgroundTransparency = 1
+        label.TextColor3 = Color3.fromRGB(255,255,255)
+        label.Parent = ContentFrame
+
+        local box = Instance.new("TextBox")
+        box.Size = UDim2.new(0,150,0,30)
+        box.Position = UDim2.new(0,160,0,y)
+        box.BackgroundColor3 = Color3.fromRGB(60,60,60)
+        box.TextColor3 = Color3.fromRGB(255,255,255)
+        box.ClearTextOnFocus = false
+        box.Text = "" -- inicia vazio
+        box.Parent = ContentFrame
+
+        local button = Instance.new("TextButton")
+        button.Text = "Set"
+        button.Size = UDim2.new(0,50,0,30)
+        button.Position = UDim2.new(0,320,0,y)
+        button.BackgroundColor3 = Color3.fromRGB(80,80,80)
+        button.TextColor3 = Color3.fromRGB(255,255,255)
+        button.Parent = ContentFrame
+
+        button.MouseButton1Click:Connect(function()
+            callback(box.Text)
+        end)
+
+        y = y + 40
+    end
+
+    -- WalkSpeed
+    AddTextBoxOption("Set WalkSpeed:", function(val)
+        val = tonumber(val)
+        if val and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = val
+        end
+    end)
+
+    -- JumpPower
+    AddTextBoxOption("Set Power Jump:", function(val)
+        val = tonumber(val)
+        if val and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.JumpPower = val
+        end
+    end)
+
+    -- ESP ON/OFF
+    local ESPButton = Instance.new("TextButton")
+    ESPButton.Text = "ESP: OFF"
+    ESPButton.Size = UDim2.new(0,150,0,30)
+    ESPButton.Position = UDim2.new(0,10,0,y)
+    ESPButton.BackgroundColor3 = Color3.fromRGB(200,0,0)
+    ESPButton.TextColor3 = Color3.fromRGB(255,255,255)
+    ESPButton.Parent = ContentFrame
+    ESPButton.MouseButton1Click:Connect(function()
+        ESPEnabled = not ESPEnabled
+        if ESPEnabled then
+            UpdateESP()
+            ESPButton.Text = "ESP: ON"
+            AnimateButton(ESPButton,true)
+        else
+            RemoveESP()
+            ESPButton.Text = "ESP: OFF"
+            AnimateButton(ESPButton,false)
+        end
+    end)
+    y = y + 40
+
+    -- Noclip ON/OFF
+    local NoclipButton = Instance.new("TextButton")
+    NoclipButton.Text = "Noclip: OFF"
+    NoclipButton.Size = UDim2.new(0,150,0,30)
+    NoclipButton.Position = UDim2.new(0,10,0,y)
+    NoclipButton.BackgroundColor3 = Color3.fromRGB(200,0,0)
+    NoclipButton.TextColor3 = Color3.fromRGB(255,255,255)
+    NoclipButton.Parent = ContentFrame
+    NoclipButton.MouseButton1Click:Connect(function()
+        NoclipEnabled = not NoclipEnabled
+        NoclipButton.Text = NoclipEnabled and "Noclip: ON" or "Noclip: OFF"
+        AnimateButton(NoclipButton,NoclipEnabled)
+    end)
+    y = y + 40
+
+    -- Fly ON/OFF
+    local FlyButton = Instance.new("TextButton")
+    FlyButton.Text = "Fly: OFF"
+    FlyButton.Size = UDim2.new(0,150,0,30)
+    FlyButton.Position = UDim2.new(0,10,0,y)
+    FlyButton.BackgroundColor3 = Color3.fromRGB(200,0,0)
+    FlyButton.TextColor3 = Color3.fromRGB(255,255,255)
+    FlyButton.Parent = ContentFrame
+    FlyButton.MouseButton1Click:Connect(function()
+        if Flying then
+            StopFly()
+            FlyButton.Text = "Fly: OFF"
+            AnimateButton(FlyButton,false)
+        else
+            StartFly()
+            FlyButton.Text = "Fly: ON"
+            AnimateButton(FlyButton,true)
+        end
+    end)
+    y = y + 40
+
+    -- Goto Players
+    local GotoButton = Instance.new("TextButton")
+    GotoButton.Text = "Goto Player"
+    GotoButton.Size = UDim2.new(0,150,0,30)
+    GotoButton.Position = UDim2.new(0,10,0,y)
+    GotoButton.BackgroundColor3 = Color3.fromRGB(100,100,255)
+    GotoButton.TextColor3 = Color3.fromRGB(255,255,255)
+    GotoButton.Parent = ContentFrame
+    GotoButton.MouseButton1Click:Connect(function()
+        ClearContent()
+        local py = 10
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                local pBtn = Instance.new("TextButton")
+                pBtn.Size = UDim2.new(0,200,0,30)
+                pBtn.Position = UDim2.new(0,10,0,py)
+                pBtn.Text = player.Name
+                pBtn.BackgroundColor3 = Color3.fromRGB(120,120,120)
+                pBtn.TextColor3 = Color3.fromRGB(255,255,255)
+                pBtn.Parent = ContentFrame
+                pBtn.MouseButton1Click:Connect(function()
+                    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                        LocalPlayer.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame + Vector3.new(0,3,0)
+                    end
+                end)
+                py = py + 35
+            end
+        end
+    end)
+end
+
+local function LoadTrool()
+    ClearContent()
+    local y = 10
+    local SkinButton = Instance.new("TextButton")
+    SkinButton.Size = UDim2.new(0,150,0,30)
+    SkinButton.Position = UDim2.new(0,10,0,y)
+    SkinButton.Text = "Skin RGB: OFF"
+    SkinButton.BackgroundColor3 = Color3.fromRGB(200,50,50)
+    SkinButton.TextColor3 = Color3.fromRGB(255,255,255)
+    SkinButton.Parent = ContentFrame
+    SkinButton.MouseButton1Click:Connect(function()
+        SkinRGBEnabled = not SkinRGBEnabled
+        SkinButton.Text = SkinRGBEnabled and "Skin RGB: ON" or "Skin RGB: OFF"
+        AnimateButton(SkinButton,SkinRGBEnabled)
+    end)
+end
+
+-- =========================
+-- Conectar abas
+-- =========================
+MainPageButton.MouseButton1Click:Connect(LoadMain)
+TroolPageButton.MouseButton1Click:Connect(LoadTrool)
+
+-- Carregar página principal
+LoadMain()
